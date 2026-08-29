@@ -1,0 +1,14 @@
+{
+  "name": "paper-cut-demo",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "preview": "hyperframes preview .",
+    "check": "hyperframes check . --samples 15 --at-transitions",
+    "render": "hyperframes render . --quality draft --output renders/paper-cut-layer-demo-20s-motion-v2.mp4 --strict"
+  },
+  "dependencies": {
+    "gsap": "3.14.2",
+    "hyperframes": "0.8.18"
+  }
+}

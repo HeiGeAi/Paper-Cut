@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "slug": "paper-cut-layer-demo",
+  "stage": "preview-review",
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationSeconds": 20,
+    "language": "zh-CN"
+  },
+  "style": {
+    "mood": "editorial, tactile, playful",
+    "palette": ["#F4E9D1", "#172B4D", "#F05D43", "#1769D2", "#D9A520"],
+    "paperTreatment": "warm ivory stock, torn edges, halftone ink, soft directional shadows"
+  },
+  "approvals": {
+    "storyboard": {"approved": true, "note": "User rejected the flat poster-like motion and requested a stronger 20s five-layer assembly, exploded view, collision, and recomposition test.", "at": "2026-08-30"},
+    "assets": {
+      "approved": true,
+      "note": "One image-model hero frame; all other assets are local derivatives. No voice, sound, or video provider.",
+      "at": "2026-08-28",
+      "providers": {"image": "OpenAI built-in image generation", "voice": null, "sound": null, "video": null},
+      "attemptCaps": {"image": 1, "voice": 0, "video": 0, "sound": 0},
+      "attemptUsage": {"image": 1, "voice": 0, "video": 0, "sound": 0}
+    },
+    "preview": {"approved": false, "note": "V1 was rejected as too close to a moving poster. Motion V2 is the current draft review surface.", "at": null}
+  },
+  "scenes": [
+    {
+      "id": "scene-01",
+      "start": 0,
+      "duration": 20,
+      "purpose": "prove that the approved hero frame can become true layered paper motion",
+      "voiceover": "",
+      "heroFrame": "Warm editorial paper collage with a cream sheet, coral strip, navy arrow, cobalt circle, upper-left negative space for labels.",
+      "background": "assets/processed/scene-01-paper-stage.png",
+      "fixedElements": ["source-derived paper stage", "editable editorial labels"],
+      "movingLayers": ["assets/processed/scene-01-bottom-sheet-crop.png", "assets/processed/scene-01-red-strip-crop.png", "assets/processed/scene-01-top-sheet-crop.png", "assets/processed/scene-01-arrow-crop.png", "assets/processed/scene-01-blue-circle-crop.png"],
+      "onScreenText": ["不是推一张图", "是五层重组", "真正的拆层运动", "组装、炸开、碰撞、再落版"],
+      "motion": {"hero": "five source-derived paper layers assemble, explode into depth, reassemble, collide, and settle", "secondary": "layer ID tags stamp in during the exploded-view beat", "camera": "3D-like parallax push from 14.15s to 18.1s"},
+      "transition": {"type": "none", "duration": 0},
+      "safety": "no sensitive geographic boundary"
+    }
+  ],
+  "delivery": {"previewPath": "renders/paper-cut-layer-demo-20s-motion-v2.mp4", "finalPath": null, "qaDir": "qa"}
+}

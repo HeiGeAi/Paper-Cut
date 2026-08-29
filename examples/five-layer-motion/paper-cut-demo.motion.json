@@ -1,0 +1,9 @@
+{
+  "duration": 20,
+  "assertions": [
+    {"kind": "appearsBy", "selector": ".bottom-layer", "bySec": 1.5},
+    {"kind": "appearsBy", "selector": ".circle-layer", "bySec": 4.1},
+    {"kind": "before", "a": ".bottom-layer", "b": ".circle-layer"},
+    {"kind": "keepsMoving", "withinSelector": ".scene", "maxStaticSec": 1.8}
+  ]
+}

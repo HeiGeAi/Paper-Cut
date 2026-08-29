@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "scene-01-hero",
+      "sceneIds": ["scene-01"],
+      "role": "background",
+      "sourcePath": "assets/originals/scene-01-hero.png",
+      "processedPath": "assets/originals/scene-01-hero.png",
+      "alphaRequired": false,
+      "status": "approved",
+      "provider": "OpenAI built-in image generation",
+      "attemptId": "01a04605-76af-7e73-bee0-9b22854f8424",
+      "sha256": "20aeb61d3fe43becbb08adc1dcc7982ebd6c5ccef158dc51860b562ce7c09c31",
+      "notes": "Complete hero frame; single image-model attempt."
+    },
+    {
+      "id": "scene-01-paper-stage",
+      "sceneIds": ["scene-01"],
+      "role": "background",
+      "sourcePath": "assets/originals/scene-01-hero.png",
+      "processedPath": "assets/processed/scene-01-paper-stage.png",
+      "alphaRequired": false,
+      "status": "processed",
+      "provider": "local original-frame derivative",
+      "attemptId": "local-2026-08-30",
+      "sha256": "391ceaa03f93ebdd7f57399e18ae896f7dc336785f082ceb6b459e9cf288f05a",
+      "notes": "Neutral paper stage enlarged from an unoccupied area of the approved hero frame."
+    },
+    {
+      "id": "scene-01-bottom-sheet",
+      "sceneIds": ["scene-01"],
+      "role": "subject",
+      "sourcePath": "assets/originals/scene-01-hero.png",
+      "processedPath": "assets/processed/scene-01-bottom-sheet-crop.png",
+      "alphaRequired": true,
+      "status": "processed",
+      "provider": "local original-frame extraction",
+      "attemptId": "local-2026-08-30",
+      "sha256": "d83b056c6c03db5281e8595365f480547acf40f78dc009bb221b83ba7ce5a127",
+      "notes": "Rear depth layer."
+    },
+    {
+      "id": "scene-01-red-strip",
+      "sceneIds": ["scene-01"],
+      "role": "subject",
+      "sourcePath": "assets/originals/scene-01-hero.png",
+      "processedPath": "assets/processed/scene-01-red-strip-crop.png",
+      "alphaRequired": true,
+      "status": "processed",
+      "provider": "local original-frame extraction",
+      "attemptId": "local-2026-08-30",
+      "sha256": "23f6c7fc43b977c242fd2e4bdaf0845494a0aca76edd34114e6e2ac25dafb040",
+      "notes": "Independently sliding middle layer."
+    },
+    {
+      "id": "scene-01-top-sheet",
+      "sceneIds": ["scene-01"],
+      "role": "subject",
+      "sourcePath": "assets/originals/scene-01-hero.png",
+      "processedPath": "assets/processed/scene-01-top-sheet-crop.png",
+      "alphaRequired": true,
+      "status": "processed",
+      "provider": "local original-frame extraction",
+      "attemptId": "local-2026-08-30",
+      "sha256": "610c312fd5f960d5c7eaec8959087f3d5efd0a305c81bd32025fbb70fb2f05db",
+      "notes": "Top paper board with the focal cutout exposed during the exploded view."
+    },
+    {
+      "id": "scene-01-arrow",
+      "sceneIds": ["scene-01"],
+      "role": "subject",
+      "sourcePath": "assets/originals/scene-01-hero.png",
+      "processedPath": "assets/processed/scene-01-arrow-crop.png",
+      "alphaRequired": true,
+      "status": "processed",
+      "provider": "local original-frame extraction",
+      "attemptId": "local-2026-08-30",
+      "sha256": "b1954e81d98e226ca5feeac8f8dba0e602ad16f2bedecea00c17b80abf603053",
+      "notes": "Foreground motion layer and collision driver."
+    },
+    {
+      "id": "scene-01-blue-circle",
+      "sceneIds": ["scene-01"],
+      "role": "subject",
+      "sourcePath": "assets/originals/scene-01-hero.png",
+      "processedPath": "assets/processed/scene-01-blue-circle-crop.png",
+      "alphaRequired": true,
+      "status": "processed",
+      "provider": "local original-frame extraction",
+      "attemptId": "local-2026-08-30",
+      "sha256": "4febf4edfd2e66047ace0e1a367b53bf6eaad06431c8dc63df605c34301fa638",
+      "notes": "Focal paper layer with recoil and parallax motion."
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Paper Cut Layer Motion V2</title>
+    <script src="./node_modules/gsap/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ivory: #f4e9d1;
+        --navy: #172b4d;
+        --coral: #b43b2b;
+        --cobalt: #1769d2;
+        --mustard: #d9a520;
+      }
+      @font-face { font-family: "PingFang SC"; src: local("PingFang SC"); }
+      @font-face { font-family: "Hiragino Sans GB"; src: local("Hiragino Sans GB"); }
+      @font-face { font-family: "SFMono-Regular"; src: local("SFMono-Regular"); }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ivory);
+      }
+      body {
+        font-family: "PingFang SC", "Hiragino Sans GB", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--navy);
+      }
+      #paper-cut-demo,
+      .scene {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ivory);
+      }
+      .scene { position: absolute; inset: 0; }
+      .scene-camera {
+        position: absolute;
+        inset: -45px;
+        transform-origin: 50% 52%;
+      }
+      .paper-stage {
+        position: absolute;
+        inset: 0;
+        width: 2010px;
+        height: 1170px;
+        object-fit: cover;
+      }
+      .paper-layer {
+        position: absolute;
+        display: block;
+        object-fit: fill;
+        will-change: transform, opacity, filter;
+      }
+      .bottom-layer {
+        left: 465px;
+        top: 670px;
+        width: 1324px;
+        height: 409px;
+        z-index: 1;
+        transform-origin: 52% 58%;
+        filter: drop-shadow(0 18px 11px rgba(23, 43, 77, 0.16));
+      }
+      .red-layer {
+        left: 601px;
+        top: 636px;
+        width: 1212px;
+        height: 281px;
+        z-index: 2;
+        transform-origin: 55% 50%;
+        filter: drop-shadow(0 14px 9px rgba(23, 43, 77, 0.15));
+      }
+      .top-layer {
+        left: 826px;
+        top: 100px;
+        width: 1021px;
+        height: 623px;
+        z-index: 3;
+        transform-origin: 48% 52%;
+        filter: drop-shadow(0 18px 12px rgba(23, 43, 77, 0.16));
+      }
+      .arrow-layer {
+        left: 93px;
+        top: 538px;
+        width: 1169px;
+        height: 586px;
+        z-index: 4;
+        transform-origin: 68% 50%;
+        filter: drop-shadow(0 15px 9px rgba(23, 43, 77, 0.2));
+      }
+      .circle-layer {
+        left: 1055px;
+        top: 143px;
+        width: 604px;
+        height: 535px;
+        z-index: 5;
+        transform-origin: 50% 50%;
+        filter: drop-shadow(0 16px 10px rgba(23, 43, 77, 0.22));
+      }
+      .title-block {
+        position: absolute;
+        z-index: 20;
+        left: 120px;
+        top: 105px;
+        width: 610px;
+      }
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--coral);
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 34px;
+        height: 5px;
+        background: var(--coral);
+      }
+      .headline {
+        margin: 28px 0 0;
+        font-size: 80px;
+        line-height: 1.02;
+        letter-spacing: -0.07em;
+        font-weight: 950;
+      }
+      .headline em {
+        display: block;
+        color: var(--cobalt);
+        font-style: normal;
+      }
+      .subline {
+        margin-top: 24px;
+        padding-left: 18px;
+        border-left: 7px solid var(--mustard);
+        font-size: 28px;
+        line-height: 1.35;
+        font-weight: 760;
+      }
+      .exploded-title {
+        position: absolute;
+        z-index: 22;
+        left: 120px;
+        top: 440px;
+        padding: 13px 18px 14px;
+        color: var(--ivory);
+        background: var(--navy);
+        box-shadow: 9px 9px 0 rgba(180, 59, 43, 0.9);
+        font-size: 25px;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+        opacity: 0;
+      }
+      .depth-tag {
+        position: absolute;
+        z-index: 24;
+        min-width: 138px;
+        padding: 11px 14px;
+        border: 3px solid var(--navy);
+        color: var(--navy);
+        background: rgba(255, 249, 235, 0.95);
+        box-shadow: 7px 7px 0 rgba(23, 43, 77, 0.13);
+        font-size: 18px;
+        font-weight: 850;
+        visibility: hidden;
+      }
+      .depth-tag span {
+        margin-right: 8px;
+        color: var(--coral);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .tag-bottom { left: 1430px; top: 895px; }
+      .tag-red { left: 1490px; top: 700px; }
+      .tag-top { left: 1490px; top: 305px; }
+      .tag-arrow { left: 635px; top: 780px; }
+      .tag-circle { left: 1570px; top: 155px; }
+      .impact-ring {
+        position: absolute;
+        z-index: 18;
+        left: 1285px;
+        top: 325px;
+        width: 230px;
+        height: 230px;
+        border: 14px solid var(--mustard);
+        border-radius: 50%;
+        opacity: 0;
+      }
+      .motion-stamp {
+        position: absolute;
+        z-index: 25;
+        right: 118px;
+        bottom: 92px;
+        padding: 15px 20px;
+        border: 4px solid var(--coral);
+        color: var(--coral);
+        background: rgba(244, 233, 209, 0.9);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        transform: rotate(-3deg);
+        opacity: 0;
+      }
+      .frame-index {
+        position: absolute;
+        z-index: 22;
+        left: 120px;
+        bottom: 80px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.13em;
+        padding: 8px 11px;
+        background: #fff9eb;
+        visibility: hidden;
+      }
+      .frame-index::after {
+        content: "";
+        display: inline-block;
+        width: 150px;
+        height: 3px;
+        margin: 0 0 5px 14px;
+        background: var(--navy);
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-tmiv" id="paper-cut-demo" data-composition-id="paper-cut-demo" data-start="0" data-width="1920" data-height="1080" data-duration="20">
+      <section data-hf-id="hf-znvu" id="scene-01" class="scene clip" data-start="0" data-duration="20" data-track-index="0">
+        <div data-hf-id="hf-6m41" class="scene-camera" data-layout-allow-overflow="">
+          <img data-hf-id="hf-psi7" class="paper-stage" src="./assets/processed/scene-01-paper-stage.png" alt="">
+          <img data-hf-id="hf-zdl3" class="paper-layer bottom-layer" src="./assets/processed/scene-01-bottom-sheet-crop.png" alt="" data-layout-allow-overflow="">
+          <img data-hf-id="hf-02f6" class="paper-layer red-layer" src="./assets/processed/scene-01-red-strip-crop.png" alt="" data-layout-allow-overflow="">
+          <img data-hf-id="hf-e7m7" class="paper-layer top-layer" src="./assets/processed/scene-01-top-sheet-crop.png" alt="" data-layout-allow-overflow="">
+          <img data-hf-id="hf-1hwl" class="paper-layer arrow-layer" src="./assets/processed/scene-01-arrow-crop.png" alt="" data-layout-allow-overflow="">
+          <img data-hf-id="hf-qyzy" class="paper-layer circle-layer" src="./assets/processed/scene-01-blue-circle-crop.png" alt="" data-layout-allow-overflow="">
+          <div data-hf-id="hf-ygea" class="impact-ring" aria-hidden="true"></div>
+        </div>
+        <div data-hf-id="hf-cgbe" class="title-block">
+          <div data-hf-id="hf-21gb" class="eyebrow">PAPER / CUT · MOTION TEST 02</div>
+          <h1 data-hf-id="hf-qvtw" class="headline">不是推一张图<em data-hf-id="hf-uhwb">是五层重组</em></h1>
+          <div data-hf-id="hf-9c64" class="subline">组装、炸开、碰撞、再落版</div>
+        </div>
+        <div data-hf-id="hf-qk32" class="exploded-title">真正的拆层运动</div>
+        <div data-hf-id="hf-vz24" class="depth-tag tag-bottom"><span data-hf-id="hf-p81i">01</span>固定底板</div>
+        <div data-hf-id="hf-40kp" class="depth-tag tag-red"><span data-hf-id="hf-pmcj">02</span>红色纸条</div>
+        <div data-hf-id="hf-i1lz" class="depth-tag tag-top"><span data-hf-id="hf-q0nk">03</span>上层纸板</div>
+        <div data-hf-id="hf-76n7" class="depth-tag tag-arrow"><span data-hf-id="hf-n8id">04</span>方向箭头</div>
+        <div data-hf-id="hf-zfin" class="depth-tag tag-circle"><span data-hf-id="hf-nmte">05</span>焦点圆片</div>
+        <div data-hf-id="hf-nqph" class="motion-stamp">5 LAYERS · REAL PARALLAX</div>
+        <div data-hf-id="hf-64pz" class="frame-index">LOCAL LAYERS / NO VIDEO MODEL</div>
+      </section>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(".scene-camera", { x: 12, y: 8, scale: 1.025 }, { x: 0, y: 0, scale: 1, duration: 4.2, ease: "power1.out" }, 0);
+      tl.fromTo(".bottom-layer", { x: -260, y: 260, rotation: -8, opacity: 0 }, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 1.25, ease: "back.out(1.18)" }, 0.15);
+      tl.fromTo(".red-layer", { x: 720, y: 45, rotation: 7, opacity: 0 }, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 1.15, ease: "power4.out" }, 0.72);
+      tl.fromTo(".top-layer", { x: 110, y: -520, rotation: -9, opacity: 0 }, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 1.35, ease: "back.out(1.24)" }, 1.28);
+      tl.fromTo(".arrow-layer", { x: -980, y: 430, rotation: -15, opacity: 0 }, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 1.25, ease: "power4.out" }, 1.95);
+      tl.fromTo(".circle-layer", { x: 590, y: -420, scale: 0.32, rotation: 58, opacity: 0 }, { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, duration: 1.1, ease: "back.out(1.75)" }, 2.78);
+      tl.fromTo(".eyebrow", { x: -48, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 0.45);
+      tl.fromTo(".headline", { y: 54, rotation: -2, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.85, ease: "back.out(1.22)" }, 3.32);
+      tl.fromTo(".subline", { x: -32, opacity: 0 }, { x: 0, opacity: 1, duration: 0.58, ease: "power3.out" }, 4.0);
+      tl.set(".frame-index", { visibility: "visible" }, 4.35);
+      tl.fromTo(".frame-index", { y: 18 }, { y: 0, duration: 0.5, ease: "power2.out" }, 4.35);
+      tl.to(".circle-layer", { y: -22, rotation: 3.5, scale: 1.025, duration: 0.55, ease: "power2.out" }, 5.0);
+      tl.to(".circle-layer", { y: 0, rotation: 0, scale: 1, duration: 0.62, ease: "bounce.out" }, 5.55);
+      tl.to(".arrow-layer", { x: 18, y: -8, rotation: 1.1, duration: 0.48, ease: "power2.out" }, 5.15);
+      tl.to(".arrow-layer", { x: 0, y: 0, rotation: 0, duration: 0.51, ease: "back.out(1.6)" }, 5.64);
+      tl.to(".title-block", { x: -28, y: -8, scale: 0.9, opacity: 0.2, duration: 0.6, ease: "power2.in" }, 7.0);
+      tl.to(".bottom-layer", { x: 20, y: 105, rotation: 1.5, duration: 1.05, ease: "power3.inOut" }, 7.05);
+      tl.to(".red-layer", { x: -58, y: 18, rotation: -2.2, duration: 1.0, ease: "power3.inOut" }, 7.12);
+      tl.to(".top-layer", { x: 86, y: -112, rotation: 3.2, duration: 1.0, ease: "power3.inOut" }, 7.2);
+      tl.to(".arrow-layer", { x: -92, y: 92, rotation: -5.2, duration: 1.0, ease: "power3.inOut" }, 7.28);
+      tl.to(".circle-layer", { x: 170, y: -92, rotation: 8, scale: 1.08, duration: 1.0, ease: "power3.inOut" }, 7.36);
+      tl.fromTo(".exploded-title", { x: -32, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 7.72);
+      tl.set(".depth-tag", { visibility: "visible" }, 7.85);
+      tl.fromTo(".depth-tag", { y: 18, scale: 0.82 }, { y: 0, scale: 1, duration: 0.48, stagger: 0.11, ease: "back.out(1.5)" }, 7.85);
+      tl.to(".circle-layer", { x: 146, y: -112, rotation: 3.5, duration: 0.72, ease: "power1.inOut" }, 9.05);
+      tl.to(".arrow-layer", { x: -68, y: 74, rotation: -3.4, duration: 0.72, ease: "power1.inOut" }, 9.05);
+      tl.to(".top-layer", { x: 70, y: -94, rotation: 2.2, duration: 0.72, ease: "power1.inOut" }, 9.05);
+      tl.to(".depth-tag", { y: -12, scale: 0.9, duration: 0.35, stagger: 0.05, ease: "power2.in" }, 10.35);
+      tl.set(".depth-tag", { visibility: "hidden" }, 10.71);
+      tl.to(".exploded-title", { x: 28, opacity: 0, duration: 0.35, ease: "power2.in" }, 10.48);
+      tl.to(".bottom-layer", { x: 0, y: 0, rotation: 0, duration: 0.95, ease: "back.out(1.18)" }, 10.55);
+      tl.to(".red-layer", { x: 0, y: 0, rotation: 0, duration: 0.9, ease: "back.out(1.24)" }, 10.68);
+      tl.to(".top-layer", { x: 0, y: 0, rotation: 0, duration: 0.88, ease: "back.out(1.24)" }, 10.82);
+      tl.to(".arrow-layer", { x: 0, y: 0, rotation: 0, duration: 0.85, ease: "back.out(1.28)" }, 11.02);
+      tl.to(".circle-layer", { x: 0, y: 0, rotation: 0, scale: 1, duration: 0.82, ease: "back.out(1.4)" }, 11.22);
+      tl.to(".title-block", { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.72, ease: "power3.out" }, 11.5);
+      tl.to(".arrow-layer", { x: 54, y: -24, scale: 1.055, rotation: 1.8, duration: 0.34, ease: "power4.in" }, 12.72);
+      tl.to(".circle-layer", { x: 62, y: -34, scale: 0.94, rotation: -6, duration: 0.34, ease: "power4.out" }, 12.72);
+      tl.set(".impact-ring", { scale: 0.35, opacity: 0.9 }, 12.78);
+      tl.to(".impact-ring", { scale: 1.75, opacity: 0, duration: 0.72, ease: "power2.out" }, 12.78);
+      tl.to(".arrow-layer", { x: 0, y: 0, scale: 1, rotation: 0, duration: 0.62, ease: "back.out(1.85)" }, 13.06);
+      tl.to(".circle-layer", { x: 0, y: 0, scale: 1, rotation: 0, duration: 0.72, ease: "elastic.out(1, 0.42)" }, 13.06);
+      tl.to(".scene-camera", { x: -34, y: -18, scale: 1.055, duration: 3.95, ease: "power1.inOut" }, 14.15);
+      tl.to(".bottom-layer", { x: -8, y: 10, rotation: -0.4, duration: 3.45, ease: "power1.inOut" }, 14.25);
+      tl.to(".red-layer", { x: -16, y: 3, rotation: -0.7, duration: 3.45, ease: "power1.inOut" }, 14.25);
+      tl.to(".top-layer", { x: 12, y: -14, rotation: 0.7, duration: 3.45, ease: "power1.inOut" }, 14.25);
+      tl.to(".arrow-layer", { x: 24, y: -17, rotation: 1.0, duration: 3.45, ease: "power1.inOut" }, 14.25);
+      tl.to(".circle-layer", { x: 42, y: -29, rotation: 2.0, scale: 1.025, duration: 3.45, ease: "power1.inOut" }, 14.25);
+      tl.fromTo(".motion-stamp", { scale: 1.55, rotation: 9, opacity: 0 }, { scale: 1, rotation: -3, opacity: 1, duration: 0.58, ease: "back.out(1.7)" }, 15.55);
+      tl.to(".bottom-layer, .red-layer, .top-layer, .arrow-layer, .circle-layer", { x: 0, y: 0, rotation: 0, scale: 1, duration: 1.0, ease: "power2.inOut" }, 18.18);
+      tl.to(".scene-camera", { x: -22, y: -12, scale: 1.04, duration: 1.0, ease: "power2.inOut" }, 18.18);
+      tl.to(".motion-stamp", { rotation: -1.5, duration: 0.7, ease: "power1.inOut" }, 18.6);
+      window.__timelines["paper-cut-demo"] = tl;
+    </script>
+  </body>
+</html>
