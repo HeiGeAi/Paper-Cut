@@ -73,7 +73,7 @@ git clone https://github.com/HeiGeAi/Paper-Cut.git "$env:USERPROFILE\.codex\skil
 
 - Codex 与可用的图像生成能力
 - HyperFrames 及其 CLI
-- Python 3
+- Python 3，并安装脚本依赖：`pip install -r requirements.txt`
 - FFmpeg / FFprobe
 - 旁白或音效供应商（仅在项目需要时）
 

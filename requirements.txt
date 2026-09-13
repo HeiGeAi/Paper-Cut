@@ -1,0 +1,4 @@
+# Python dependencies for scripts/ and examples/five-layer-motion/scripts/
+# Pillow >= 9.1 for Image.Resampling; numpy >= 1.21 for typed array ops
+Pillow>=9.1
+numpy>=1.21
