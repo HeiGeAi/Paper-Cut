@@ -80,7 +80,7 @@ git clone https://github.com/HeiGeAi/Paper-Cut.git "$env:USERPROFILE\.codex\skil
 可先运行环境检查：
 
 ```powershell
-python scripts/check_environment.py <project-directory>
+python scripts/check_environment.py --project-dir <project-directory>
 ```
 
 项目完成前可验证状态文件：
