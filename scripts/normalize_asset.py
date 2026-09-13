@@ -19,6 +19,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.canvas < 64 or not 0.1 <= args.occupancy <= 0.95:
         raise SystemExit("invalid canvas or occupancy")
+    if args.padding < 0 or 2 * args.padding >= int(args.canvas * args.occupancy):
+        raise SystemExit("invalid padding: must be >= 0 and leave a usable area (2 * padding < canvas * occupancy)")
     image = Image.open(args.input).convert("RGBA")
     bbox = image.getchannel("A").getbbox()
     if bbox is None:
