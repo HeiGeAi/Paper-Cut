@@ -83,6 +83,8 @@ git clone https://github.com/HeiGeAi/Paper-Cut.git "$env:USERPROFILE\.codex\skil
 python scripts/check_environment.py --project-dir <project-directory>
 ```
 
+环境检查默认只探测 PATH 与 `HYPERFRAMES_FFMPEG_PATH` / `HYPERFRAMES_FFPROBE_PATH` 环境变量。项目目录内自带的 ffmpeg/ffprobe（Windows `.exe`）需要显式加 `--allow-local-bin` 才会被探测和执行，请只对可信项目开启。
+
 项目完成前可验证状态文件：
 
 ```powershell

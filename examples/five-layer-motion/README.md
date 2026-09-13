@@ -27,3 +27,5 @@ npm run render
 - `renders/paper-cut-layer-demo-20s-motion-v2.mp4`：20 秒无声参考成片。
 
 本示例没有调用视频模型、GIF 生成模型或任何静默 provider 切换。README GIF 由这条 MP4 使用 FFmpeg 本地转码产生。
+
+注意：`scripts/make_demo_assets.py` 中的几何掩码坐标（ellipse、polygon 等）与随附的 `assets/originals/scene-01-hero.png` 尺寸和构图硬绑定，仅用于从这张 hero frame 复现派生层；换成自己的图片前必须先按新图调整掩码坐标，否则会静默错位。
