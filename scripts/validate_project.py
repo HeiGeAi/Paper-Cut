@@ -110,7 +110,16 @@ def main() -> int:
                 errors.append(f"{prefix} references unknown scene {scene_id!r}")
         for key in ("sourcePath", "processedPath"):
             relative = asset.get(key)
-            if relative and asset.get("status") in {"generated", "processed", "approved", "approved-for-preview", "approved-for-revision"}:
+            if not relative:
+                continue
+            if not isinstance(relative, str):
+                errors.append(f"{prefix}.{key} must be a string")
+                continue
+            relative_path = Path(relative)
+            if relative_path.is_absolute() or ".." in relative_path.parts:
+                errors.append(f"{prefix}.{key} must be a relative path inside the project: {relative}")
+                continue
+            if asset.get("status") in {"generated", "processed", "approved", "approved-for-preview", "approved-for-revision"}:
                 if not (root / relative).exists() and not (root / "hyperframes" / relative).exists():
                     errors.append(f"{prefix}.{key} does not exist: {relative}")
 
