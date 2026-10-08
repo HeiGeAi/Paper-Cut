@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import hashlib
+import re
 import sys
 from pathlib import Path
 
@@ -14,9 +17,20 @@ ROLES = {"background", "subject", "prop", "texture", "type", "typography", "audi
 STATUSES = {"planned", "generated", "processed", "approved", "approved-for-preview", "approved-for-revision", "rejected", "superseded"}
 
 
+def finite_number(value: object) -> bool:
+    try:
+        return type(value) in (int, float) and math.isfinite(value)
+    except OverflowError:
+        return False
+
+
+def reject_constant(value: str):
+    raise ValueError(f"invalid JSON numeric constant: {value}")
+
+
 def load(path: Path) -> object:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"), parse_constant=reject_constant)
     except FileNotFoundError:
         raise ValueError(f"missing file: {path.name}") from None
     except json.JSONDecodeError as exc:
@@ -49,8 +63,10 @@ def main() -> int:
     else:
         for key in ("width", "height", "fps", "durationSeconds"):
             value = video.get(key)
-            if not isinstance(value, (int, float)) or value <= 0:
-                errors.append(f"video.{key} must be positive")
+            if not finite_number(value) or value <= 0:
+                errors.append(f"video.{key} must be finite and positive")
+            elif key in {"width", "height"} and type(value) is not int:
+                errors.append(f"video.{key} must be an integer")
 
     scenes = project.get("scenes", [])
     if not isinstance(scenes, list):
@@ -71,17 +87,17 @@ def main() -> int:
             errors.append(f"duplicate scene id: {scene_id}")
         else:
             scene_ids.add(scene_id)
-        if not isinstance(start, (int, float)) or start < 0:
+        if not finite_number(start) or start < 0:
             errors.append(f"{prefix}.start must be non-negative")
             continue
         if start < last_start:
             errors.append(f"{prefix}.start is not monotonic")
         last_start = float(start)
-        if not isinstance(duration, (int, float)) or duration <= 0:
+        if not finite_number(duration) or duration <= 0:
             errors.append(f"{prefix}.duration must be positive")
             continue
         max_end = max(max_end, float(start + duration))
-    if isinstance(video, dict) and isinstance(video.get("durationSeconds"), (int, float)) and max_end > video["durationSeconds"] + 0.05:
+    if isinstance(video, dict) and finite_number(video.get("durationSeconds")) and max_end > video["durationSeconds"] + 0.05:
         errors.append("scene timing exceeds video.durationSeconds")
 
     assets = manifest.get("assets", [])
@@ -108,20 +124,50 @@ def main() -> int:
         for scene_id in asset.get("sceneIds", []):
             if scene_id not in scene_ids:
                 errors.append(f"{prefix} references unknown scene {scene_id!r}")
+        status = asset.get("status")
+        realized = status in {"generated", "processed", "approved", "approved-for-preview", "approved-for-revision"}
+        required_paths = {"sourcePath"} if realized else set()
+        if realized and status != "generated":
+            required_paths.add("processedPath")
+        files = {}
         for key in ("sourcePath", "processedPath"):
             relative = asset.get(key)
-            if not relative:
+            if relative is None or relative == "":
+                if key in required_paths:
+                    errors.append(f"{prefix}.{key} is required for {status} assets")
                 continue
-            if not isinstance(relative, str):
-                errors.append(f"{prefix}.{key} must be a string")
+            if not isinstance(relative, str) or not relative.strip():
+                errors.append(f"{prefix}.{key} must be a non-empty string")
                 continue
             relative_path = Path(relative)
             if relative_path.is_absolute() or ".." in relative_path.parts:
                 errors.append(f"{prefix}.{key} must be a relative path inside the project: {relative}")
                 continue
-            if asset.get("status") in {"generated", "processed", "approved", "approved-for-preview", "approved-for-revision"}:
-                if not (root / relative).exists() and not (root / "hyperframes" / relative).exists():
-                    errors.append(f"{prefix}.{key} does not exist: {relative}")
+            if realized:
+                candidates = [(root / relative).resolve(), (root / "hyperframes" / relative).resolve()]
+                file = next((p for p in candidates if p.is_relative_to(root) and p.is_file()), None)
+                if file is None:
+                    errors.append(f"{prefix}.{key} must identify a regular file inside the project: {relative}")
+                else:
+                    files[key] = file
+        # Hash identifies the deliverable, or the source before processing.
+        if realized:
+            digest = asset.get("sha256")
+            if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", digest):
+                errors.append(f"{prefix}.sha256 must be a SHA-256 hex digest")
+            else:
+                file = files.get("processedPath") or files.get("sourcePath")
+                if file is not None:
+                    checksum = hashlib.sha256()
+                    try:
+                        with file.open("rb") as handle:
+                            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                                checksum.update(chunk)
+                    except OSError as exc:
+                        errors.append(f"{prefix}: cannot read asset file: {exc}")
+                        continue
+                    if checksum.hexdigest() != digest.lower():
+                        errors.append(f"{prefix}.sha256 does not match the asset file")
 
     for required in ("video-script.md", "storyboard.md"):
         if not (root / required).is_file():
