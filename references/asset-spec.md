@@ -45,3 +45,7 @@ Lock paper stock, edge treatment, print process, grain, shadow direction/depth, 
 Cropping transparent margins, alpha cleanup, masking, local inpainting, compositing, mirroring, resizing, color correction, shadow repair, paper outlines, and texture overlays are local derivatives and do not consume provider attempts.
 
 Reject disconnected edge debris, clipped silhouettes, inconsistent paper, obvious watermark residue, unintended geographic symbols, or unreadable generated text.
+
+## Validator integrity rules
+
+Planned assets may omit file paths and hashes. Generated assets require `sourcePath`; processed and approved assets also require `processedPath` (it may equal `sourcePath` for an unchanged original). Realized asset paths must identify regular files inside the project. `sha256` must match `processedPath` when present, otherwise `sourcePath`. Width and height must be positive integers; frame rate and all timing values must be finite numbers, never booleans.
